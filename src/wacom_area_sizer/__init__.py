@@ -12,12 +12,13 @@ from PySide6.QtCore import Qt, QRect
 import subprocess
 from pathlib import Path
 
+# TODO remove hard-coded variables
 DISPLAY_X = 3840
 DISPLAY_Y = 2160
 TABLET_X = 21600
 TABLET_Y = 13500
-DEFAULT_OPACITY = 0.7
 ID_DEVICE = 11
+DEFAULT_OPACITY = 0.7
 PATH_ICON = Path(__file__).parent / "icon.png"
 
 
