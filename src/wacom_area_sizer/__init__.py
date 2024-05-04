@@ -50,7 +50,6 @@ def get_tablet_id():
     pattern = re.compile(r"id:\s*(\d+).*STYLUS")
     match = pattern.search(output)
 
-    # 結果の出力
     if match:
         return int(match.group(1))
     else:
