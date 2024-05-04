@@ -24,7 +24,7 @@ The command `was` will open a new window.
 
 ![](screenshot.png)
 
-The area of the window will be the canvas area of the wacom tablet.
+The area of the window will be the canvas area of the Wacom tablet.
 You can change the size and position of the canvas by dragging the window.
 
 # Uninstall
