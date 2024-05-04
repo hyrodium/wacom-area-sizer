@@ -20,6 +20,7 @@ Prerequisite:
 
 - `xsetwacom`
 - `xinput`
+- `xrandr`
 
 # Usage
 

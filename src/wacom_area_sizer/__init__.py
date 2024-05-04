@@ -10,16 +10,35 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QPainter, QColor, QPalette, QIcon, QPen, QFont
 from PySide6.QtCore import Qt, QRect
 import subprocess
+import re
 from pathlib import Path
 
 # TODO remove hard-coded variables
-DISPLAY_X = 3840
-DISPLAY_Y = 2160
 TABLET_X = 21600
 TABLET_Y = 13500
 ID_DEVICE = 11
 DEFAULT_OPACITY = 0.7
 PATH_ICON = Path(__file__).parent / "icon.png"
+
+
+class ResolutionError(Exception):
+    """Exception raised when screen resolution cannot be determined."""
+
+    pass
+
+
+def get_display_size():
+    result = subprocess.run(["xrandr"], stdout=subprocess.PIPE)
+    output = result.stdout.decode("utf-8")
+
+    match = re.search(r"current (\d+) x (\d+)", output)
+    if match:
+        width, height = match.groups()
+        return int(width), int(height)
+    else:
+        raise ResolutionError(
+            "Screen resolution could not be determined from xrandr output."
+        )
 
 
 class MainWindow(QWidget):
@@ -33,6 +52,8 @@ class MainWindow(QWidget):
         # Tablet size
         self.tablet_x = TABLET_X
         self.tablet_y = TABLET_Y
+
+        self.display_x, self.display_y = get_display_size()
 
         self.setWindowTitle("wacom area sizer")
         self.setWindowIcon(QIcon(str(PATH_ICON)))
@@ -56,16 +77,16 @@ class MainWindow(QWidget):
         height = draw_area.height() - 60
 
         # Window vs Display
-        if width * DISPLAY_Y <= height * DISPLAY_X:
+        if width * self.display_y <= height * self.display_x:
             _display_y = width
-            _display_x = width * DISPLAY_Y / DISPLAY_X
+            _display_x = width * self.display_y / self.display_x
         else:
-            _display_y = height * DISPLAY_X / DISPLAY_Y
+            _display_y = height * self.display_x / self.display_y
             _display_x = height
 
         _display_origin_x = (width - _display_y) / 2 + 10
         _display_origin_y = (height - _display_x) / 2 + 10
-        ratio = (_display_y / DISPLAY_X + _display_x / DISPLAY_Y) / 2
+        ratio = (_display_y / self.display_x + _display_x / self.display_y) / 2
 
         frame = self.frameGeometry()
         window_origin_x = frame.x()
@@ -247,8 +268,8 @@ class MainWindow(QWidget):
             "set-prop",
             str(ID_DEVICE),
             "Coordinate Transformation Matrix",
-            str(window_x / DISPLAY_X), "0", str(x / DISPLAY_X),
-            "0", str(window_y / DISPLAY_Y), str(y / DISPLAY_Y),
+            str(window_x / self.display_x), "0", str(x / self.display_x),
+            "0", str(window_y / self.display_y), str(y / self.display_y),
             "0", "0", "1",
         ]
         # fmt: on
