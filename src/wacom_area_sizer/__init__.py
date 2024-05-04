@@ -21,7 +21,7 @@ DEFAULT_OPACITY = 0.7
 PATH_ICON = Path(__file__).parent / "icon.png"
 
 
-class ResolutionError(Exception):
+class XrandrError(Exception):
     """Exception raised when screen resolution cannot be determined."""
 
     pass
@@ -36,7 +36,7 @@ def get_display_size():
         width, height = match.groups()
         return int(width), int(height)
     else:
-        raise ResolutionError(
+        raise XrandrError(
             "Screen resolution could not be determined from xrandr output."
         )
 
