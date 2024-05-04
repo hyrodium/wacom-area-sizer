@@ -3,8 +3,8 @@
 ![](src/wacom_area_sizer/icon.svg)
 
 I love the Wacom pen tablet, but it does not replace my mouse.
-I want to illustrate figures in a specific area in the entire display.
-`wacom-area-sizer` enables us to set up the tablet size with a simple GUI.
+I want to illustrate figures in a specific area, not in the entire display.
+`wacom-area-sizer` enables us to set up a drawing area with a simple GUI.
 
 # Install
 
