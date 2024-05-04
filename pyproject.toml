@@ -1,11 +1,13 @@
 [project]
 name = "wacom-area-sizer"
 version = "0.1.0"
-description = "Add your description here"
+description = "Update wacom tablet size with GUI"
 authors = [
     { name = "hyrodium", email = "hyrodium@gmail.com" }
 ]
-dependencies = []
+dependencies = [
+    "PySide6>=6.7.0",
+]
 readme = "README.md"
 requires-python = ">= 3.8"
 
@@ -15,10 +17,12 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-dev-dependencies = []
+dev-dependencies = [
+    "ruff>=0.4.3",
+]
 
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/wacom_area_sizer"]
+packages = ["src/wacom-area-sizer"]
