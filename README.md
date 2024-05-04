@@ -33,6 +33,8 @@ This command will open a new window like this:
 
 ![](screenshot.png)
 
+[📸🎬📺 Demo on YouTube! 📽️🎞️📹](https://www.youtube.com/watch?v=HCX8so2dX_U)
+
 The area of the window will be the canvas area of the Wacom tablet.
 You can change the size and position of the canvas by dragging the window.
 You can hide the window by
