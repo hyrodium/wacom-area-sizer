@@ -35,12 +35,13 @@ This command will open a new window like this:
 
 The area of the window will be the canvas area of the Wacom tablet.
 You can change the size and position of the canvas by dragging the window.
-
 You can hide the window by
 
 - Pushing `Esc` key.
 - Click `Hide` button in the window.
 - Click the icon in the taskbar.
+
+After hiding, you can reopen the window by clicking the icon in the taskbar.
 
 # Uninstall
 
