@@ -33,7 +33,7 @@ class MainWindow(QWidget):
         self.tablet_x = TABLET_X
         self.tablet_y = TABLET_Y
 
-        self.setWindowTitle("Wacom tablet region")
+        self.setWindowTitle("wacom area sizer")
         self.setWindowIcon(QIcon(str(PATH_ICON)))
         palette = self.palette()
         palette.setColor(QPalette.Window, QColor(255, 255, 255, 255))
