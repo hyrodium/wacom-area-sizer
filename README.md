@@ -8,24 +8,39 @@ I want to illustrate figures in a specific area, not in the entire display.
 
 # Install
 
+Installation with [rye](https://github.com/astral-sh/rye):
+
 ```
 git clone https://github.com/hyrodium/wacom-area-sizer
 cd wacom-area-sizer
 rye install .
 ```
 
+Prerequisite:
+
+- `xsetwacom`
+- `xinput`
+
 # Usage
+
+After installation, you can use `was` command.
 
 ```
 was
 ```
 
-The command `was` will open a new window.
+This command will open a new window like this:
 
 ![](screenshot.png)
 
 The area of the window will be the canvas area of the Wacom tablet.
 You can change the size and position of the canvas by dragging the window.
+
+You can hide the window by
+
+- Pushing `Esc` key.
+- Click `Hide` button in the window.
+- Click the icon in the taskbar.
 
 # Uninstall
 
