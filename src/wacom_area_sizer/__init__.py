@@ -316,6 +316,7 @@ class MainWindow(QWidget):
         cmd = ["xsetwacom", "--set", str(ID_DEVICE), "Rotate", rotation]
         subprocess.run(cmd)
 
+
 def main():
     app = QApplication(sys.argv)
     window = MainWindow()
