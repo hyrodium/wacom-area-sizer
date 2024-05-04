@@ -107,7 +107,7 @@ class MainWindow(QWidget):
 
         self.resize(800, 600)
         self.setup_ui()
-        self.update_info()
+        self.update_area()
 
     def paintEvent(self, event):
         draw_area = self.rect()
@@ -215,11 +215,11 @@ class MainWindow(QWidget):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        self.update_info()
+        self.update_area()
 
     def moveEvent(self, event):
         super().moveEvent(event)
-        self.update_info()
+        self.update_area()
 
     def setup_ui(self):
         # Add buttons
@@ -262,7 +262,7 @@ class MainWindow(QWidget):
             self.rotated_tablet_x = self.tablet_y
             self.rotated_tablet_y = self.tablet_x
         self.update()
-        self.update_info()
+        self.update_area()
 
     def toggle_opacity(self):
         if self.flag_opacity:
@@ -294,7 +294,7 @@ class MainWindow(QWidget):
             self.show()
             self.move(x, y)
 
-    def update_info(self):
+    def update_area(self):
         frame = self.frameGeometry()
         x = frame.x()
         y = frame.y()
