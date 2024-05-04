@@ -14,7 +14,6 @@ import re
 from pathlib import Path
 
 # TODO remove hard-coded variables
-ID_DEVICE = 11
 DEFAULT_OPACITY = 0.7
 PATH_ICON = Path(__file__).parent / "icon.png"
 
@@ -45,6 +44,20 @@ def get_display_size():
         )
 
 
+def get_tablet_id():
+    result = subprocess.run(["xsetwacom", "list", "devices"], stdout=subprocess.PIPE)
+    output = result.stdout.decode("utf-8")
+
+    pattern = re.compile(r"id:\s*(\d+).*STYLUS")
+    match = pattern.search(output)
+
+    # 結果の出力
+    if match:
+        return int(match.group(1))
+    else:
+        raise XsetwacomError("Tablet id could not be determined from xsetwacom output.")
+
+
 def get_tablet_size(id_device):
     subprocess.run(["xsetwacom", "--set", str(id_device), "ResetArea"])
     result = subprocess.run(
@@ -71,12 +84,15 @@ class MainWindow(QWidget):
         # Rotation index (0,1,2,3)
         self.rotation = 0
 
+        self.id_device = get_tablet_id()
         self.display_x, self.display_y = get_display_size()
-        self.tablet_x, self.tablet_y = get_tablet_size(ID_DEVICE)
+        self.tablet_x, self.tablet_y = get_tablet_size(self.id_device)
+
         self.rotated_tablet_x = self.tablet_x
         self.rotated_tablet_y = self.tablet_y
 
         print("Display size:", self.display_x, self.display_y)
+        print("Tablet id:", self.id_device)
         print("Tablet size:", self.tablet_x, self.tablet_y)
 
         self.setWindowTitle("wacom area sizer")
@@ -290,7 +306,7 @@ class MainWindow(QWidget):
         cmd = [
             "xinput",
             "set-prop",
-            str(ID_DEVICE),
+            str(self.id_device),
             "Coordinate Transformation Matrix",
             str(window_x / self.display_x), "0", str(x / self.display_x),
             "0", str(window_y / self.display_y), str(y / self.display_y),
@@ -314,7 +330,7 @@ class MainWindow(QWidget):
             cmd = [
                 "xsetwacom",
                 "--set",
-                str(ID_DEVICE),
+                str(self.id_device),
                 "Area",
                 str(x_min),
                 str(y_min),
@@ -325,7 +341,7 @@ class MainWindow(QWidget):
             cmd = [
                 "xsetwacom",
                 "--set",
-                str(ID_DEVICE),
+                str(self.id_device),
                 "Area",
                 str(y_min),
                 str(x_min),
@@ -336,7 +352,7 @@ class MainWindow(QWidget):
             cmd = [
                 "xsetwacom",
                 "--set",
-                str(ID_DEVICE),
+                str(self.id_device),
                 "Area",
                 str(x_min),
                 str(y_min),
@@ -347,7 +363,7 @@ class MainWindow(QWidget):
             cmd = [
                 "xsetwacom",
                 "--set",
-                str(ID_DEVICE),
+                str(self.id_device),
                 "Area",
                 str(y_min),
                 str(x_min),
@@ -363,7 +379,7 @@ class MainWindow(QWidget):
             rotation = "half"
         elif self.rotation == 3:
             rotation = "ccw"
-        cmd = ["xsetwacom", "--set", str(ID_DEVICE), "Rotate", rotation]
+        cmd = ["xsetwacom", "--set", str(self.id_device), "Rotate", rotation]
         subprocess.run(cmd)
 
 
