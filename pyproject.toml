@@ -11,6 +11,9 @@ dependencies = [
 readme = "README.md"
 requires-python = ">= 3.8"
 
+[project.scripts]
+was = "wacom_area_sizer:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -25,4 +28,4 @@ dev-dependencies = [
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/wacom-area-sizer"]
+packages = ["src/wacom_area_sizer"]

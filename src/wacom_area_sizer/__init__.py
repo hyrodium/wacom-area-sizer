@@ -46,27 +46,8 @@ class MainWindow(QWidget):
         self.tray_icon.activated.connect(self.on_tray_icon_activated)
 
         self.resize(800, 600)
-        self.setupUI()
+        self.setup_ui()
         self.update_info()
-
-    def setupUI(self):
-        # Add buttons
-        self.button_rotate = QPushButton("Rotate")
-        self.button_opacity = QPushButton("Fade / Reveal")
-        self.button_hide = QPushButton("Hide")
-
-        # Layout
-        hbox = QHBoxLayout()
-        hbox.addWidget(self.button_rotate)
-        hbox.addWidget(self.button_opacity)
-        hbox.addWidget(self.button_hide)
-        vbox = QVBoxLayout()
-        vbox.addStretch(1)
-        vbox.addLayout(hbox)
-        self.setLayout(vbox)
-        self.button_rotate.clicked.connect(self.rotate_tablet)
-        self.button_opacity.clicked.connect(self.toggle_opacity)
-        self.button_hide.clicked.connect(self.hidewindow)
 
     def paintEvent(self, event):
         draw_area = self.rect()
@@ -172,6 +153,40 @@ class MainWindow(QWidget):
 
         event.accept()
 
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.update_info()
+
+    def moveEvent(self, event):
+        super().moveEvent(event)
+        self.update_info()
+
+    def setup_ui(self):
+        # Add buttons
+        self.button_rotate = QPushButton("Rotate")
+        self.button_opacity = QPushButton("Fade / Reveal")
+        self.button_hide = QPushButton("Hide")
+
+        # Layout
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.button_rotate)
+        hbox.addWidget(self.button_opacity)
+        hbox.addWidget(self.button_hide)
+        vbox = QVBoxLayout()
+        vbox.addStretch(1)
+        vbox.addLayout(hbox)
+        self.setLayout(vbox)
+        self.button_rotate.clicked.connect(self.rotate_tablet)
+        self.button_opacity.clicked.connect(self.toggle_opacity)
+        self.button_hide.clicked.connect(self.hidewindow)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.hidewindow()
+            event.accept()
+        else:
+            super().keyPressEvent(event)
+
     def rotate_tablet(self):
         self.rotation = (self.rotation + 1) % 4
         if self.rotation == 0:
@@ -197,14 +212,6 @@ class MainWindow(QWidget):
             self.setWindowOpacity(1.0)
             self.flag_opacity = True
 
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self.update_info()
-
-    def moveEvent(self, event):
-        super().moveEvent(event)
-        self.update_info()
-
     def on_tray_icon_activated(self, reason):
         # Left mouse button click
         if reason == QSystemTrayIcon.Trigger:
@@ -226,13 +233,6 @@ class MainWindow(QWidget):
             self.move(x + 1, y)
             self.show()
             self.move(x, y)
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            self.hidewindow()
-            event.accept()
-        else:
-            super().keyPressEvent(event)
 
     def update_info(self):
         frame = self.frameGeometry()
@@ -316,8 +316,8 @@ class MainWindow(QWidget):
         cmd = ["xsetwacom", "--set", str(ID_DEVICE), "Rotate", rotation]
         subprocess.run(cmd)
 
-
-app = QApplication(sys.argv)
-window = MainWindow()
-window.show()
-sys.exit(app.exec())
+def main():
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
