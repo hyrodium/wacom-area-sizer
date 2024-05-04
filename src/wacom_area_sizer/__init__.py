@@ -14,14 +14,17 @@ import re
 from pathlib import Path
 
 # TODO remove hard-coded variables
-TABLET_X = 21600
-TABLET_Y = 13500
 ID_DEVICE = 11
 DEFAULT_OPACITY = 0.7
 PATH_ICON = Path(__file__).parent / "icon.png"
 
 
 class XrandrError(Exception):
+    """Exception raised when screen resolution cannot be determined."""
+
+    pass
+
+class XsetwacomError(Exception):
     """Exception raised when screen resolution cannot be determined."""
 
     pass
@@ -40,6 +43,19 @@ def get_display_size():
             "Screen resolution could not be determined from xrandr output."
         )
 
+def get_tablet_size(id_device):
+    subprocess.run(["xsetwacom", "--set", str(id_device), "ResetArea"])
+    result = subprocess.run(["xsetwacom", "--get", str(id_device), "Area"], stdout=subprocess.PIPE)
+    output = result.stdout.decode("utf-8")
+
+    match = re.search(r"0 0 (\d+) (\d+)", output)
+    if match:
+        width, height = match.groups()
+        return int(width), int(height)
+    else:
+        raise XsetwacomError(
+            "Tablet resolution could not be determined from xsetwacom output."
+        )
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -49,11 +65,14 @@ class MainWindow(QWidget):
         self.flag_opacity = True
         # Rotation index (0,1,2,3)
         self.rotation = 0
-        # Tablet size
-        self.tablet_x = TABLET_X
-        self.tablet_y = TABLET_Y
 
         self.display_x, self.display_y = get_display_size()
+        self.tablet_x, self.tablet_y = get_tablet_size(ID_DEVICE)
+        self.rotated_tablet_x = self.tablet_x
+        self.rotated_tablet_y = self.tablet_y
+
+        print("Display size:", self.display_x, self.display_y)
+        print("Tablet size:", self.tablet_x, self.tablet_y)
 
         self.setWindowTitle("wacom area sizer")
         self.setWindowIcon(QIcon(str(PATH_ICON)))
@@ -99,14 +118,14 @@ class MainWindow(QWidget):
         _window_y = window_y * ratio
 
         # Window vs Tablet
-        if self.tablet_x / self.tablet_y < window_x / window_y:
+        if self.rotated_tablet_x / self.rotated_tablet_y < window_x / window_y:
             _tablet_x = _window_x
-            _tablet_y = _window_x * self.tablet_y / self.tablet_x
+            _tablet_y = _window_x * self.rotated_tablet_y / self.rotated_tablet_x
             delta = (_tablet_y - _window_y) / 2
             _tablet_origin_x = _window_origin_x
             _tablet_origin_y = _window_origin_y - delta
         else:
-            _tablet_x = _window_y * self.tablet_x / self.tablet_y
+            _tablet_x = _window_y * self.rotated_tablet_x / self.rotated_tablet_y
             _tablet_y = _window_y
             delta = (_tablet_x - _window_x) / 2
             _tablet_origin_x = _window_origin_x - delta
@@ -212,17 +231,17 @@ class MainWindow(QWidget):
     def rotate_tablet(self):
         self.rotation = (self.rotation + 1) % 4
         if self.rotation == 0:
-            self.tablet_x = TABLET_X
-            self.tablet_y = TABLET_Y
+            self.rotated_tablet_x = self.tablet_x
+            self.rotated_tablet_y = self.tablet_y
         elif self.rotation == 1:
-            self.tablet_x = TABLET_Y
-            self.tablet_y = TABLET_X
+            self.rotated_tablet_x = self.tablet_y
+            self.rotated_tablet_y = self.tablet_x
         elif self.rotation == 2:
-            self.tablet_x = TABLET_X
-            self.tablet_y = TABLET_Y
+            self.rotated_tablet_x = self.tablet_x
+            self.rotated_tablet_y = self.tablet_y
         elif self.rotation == 3:
-            self.tablet_x = TABLET_Y
-            self.tablet_y = TABLET_X
+            self.rotated_tablet_x = self.tablet_y
+            self.rotated_tablet_y = self.tablet_x
         self.update()
         self.update_info()
 
@@ -274,14 +293,14 @@ class MainWindow(QWidget):
         ]
         # fmt: on
         subprocess.run(cmd)
-        if self.tablet_x / self.tablet_y > window_x / window_y:
-            delta = (self.tablet_x - self.tablet_y * window_x / window_y) / 2
+        if self.rotated_tablet_x / self.rotated_tablet_y > window_x / window_y:
+            delta = (self.rotated_tablet_x - self.rotated_tablet_y * window_x / window_y) / 2
             x_min, y_min = int(delta), 0
-            x_max, y_max = self.tablet_x - int(delta), self.tablet_y
+            x_max, y_max = self.rotated_tablet_x - int(delta), self.rotated_tablet_y
         else:
-            delta = (self.tablet_y - self.tablet_x * window_y / window_x) / 2
+            delta = (self.rotated_tablet_y - self.rotated_tablet_x * window_y / window_x) / 2
             x_min, y_min = 0, int(delta)
-            x_max, y_max = self.tablet_x, self.tablet_y - int(delta)
+            x_max, y_max = self.rotated_tablet_x, self.rotated_tablet_y - int(delta)
         if self.rotation == 0:
             cmd = [
                 "xsetwacom",
