@@ -24,6 +24,7 @@ class XrandrError(Exception):
 
     pass
 
+
 class XsetwacomError(Exception):
     """Exception raised when screen resolution cannot be determined."""
 
@@ -43,9 +44,12 @@ def get_display_size():
             "Screen resolution could not be determined from xrandr output."
         )
 
+
 def get_tablet_size(id_device):
     subprocess.run(["xsetwacom", "--set", str(id_device), "ResetArea"])
-    result = subprocess.run(["xsetwacom", "--get", str(id_device), "Area"], stdout=subprocess.PIPE)
+    result = subprocess.run(
+        ["xsetwacom", "--get", str(id_device), "Area"], stdout=subprocess.PIPE
+    )
     output = result.stdout.decode("utf-8")
 
     match = re.search(r"0 0 (\d+) (\d+)", output)
@@ -56,6 +60,7 @@ def get_tablet_size(id_device):
         raise XsetwacomError(
             "Tablet resolution could not be determined from xsetwacom output."
         )
+
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -294,11 +299,15 @@ class MainWindow(QWidget):
         # fmt: on
         subprocess.run(cmd)
         if self.rotated_tablet_x / self.rotated_tablet_y > window_x / window_y:
-            delta = (self.rotated_tablet_x - self.rotated_tablet_y * window_x / window_y) / 2
+            delta = (
+                self.rotated_tablet_x - self.rotated_tablet_y * window_x / window_y
+            ) / 2
             x_min, y_min = int(delta), 0
             x_max, y_max = self.rotated_tablet_x - int(delta), self.rotated_tablet_y
         else:
-            delta = (self.rotated_tablet_y - self.rotated_tablet_x * window_y / window_x) / 2
+            delta = (
+                self.rotated_tablet_y - self.rotated_tablet_x * window_y / window_x
+            ) / 2
             x_min, y_min = 0, int(delta)
             x_max, y_max = self.rotated_tablet_x, self.rotated_tablet_y - int(delta)
         if self.rotation == 0:
