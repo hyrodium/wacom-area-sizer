@@ -13,7 +13,6 @@ import subprocess
 import re
 from pathlib import Path
 
-# TODO remove hard-coded variables
 DEFAULT_OPACITY = 0.7
 PATH_ICON = Path(__file__).parent / "icon.png"
 
