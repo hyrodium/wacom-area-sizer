@@ -1,6 +1,6 @@
 [project]
 name = "wacom-area-sizer"
-version = "0.2.1"
+version = "0.2.2"
 description = "Update wacom tablet size with GUI"
 authors = [
     { name = "hyrodium", email = "hyrodium@gmail.com" }
