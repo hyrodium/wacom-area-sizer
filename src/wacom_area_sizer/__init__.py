@@ -6,8 +6,9 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QSystemTrayIcon,
+    QMenu,
 )
-from PySide6.QtGui import QPainter, QColor, QPalette, QIcon, QPen, QFont
+from PySide6.QtGui import QPainter, QColor, QPalette, QIcon, QPen, QFont, QAction
 from PySide6.QtCore import Qt, QRect
 import subprocess
 import re
@@ -104,6 +105,17 @@ class MainWindow(QWidget):
         self.tray_icon.setIcon(QIcon(str(PATH_ICON)))
         self.tray_icon.setVisible(True)
         self.tray_icon.activated.connect(self.on_tray_icon_activated)
+
+        # Create context menu for tray icon
+        self.tray_menu = QMenu()
+        show_action = QAction("Show", self)
+        show_action.triggered.connect(self.show_window)
+        quit_action = QAction("Quit", self)
+        quit_action.triggered.connect(self.quit_application)
+        self.tray_menu.addAction(show_action)
+        self.tray_menu.addSeparator()
+        self.tray_menu.addAction(quit_action)
+        self.tray_icon.setContextMenu(self.tray_menu)
 
         self.resize(800, 600)
         self.setup_ui()
@@ -322,14 +334,22 @@ class MainWindow(QWidget):
         if self.isVisible():
             self.hidewindow()
         else:
-            x = int(self.last_position.x())
-            y = int(self.last_position.y())
-            # ad-hoc move. Should be like this:
-            # self.move(x, y)
-            # self.show()
-            self.move(x + 1, y)
-            self.show()
-            self.move(x, y)
+            self.show_window()
+
+    def show_window(self):
+        x = int(self.last_position.x())
+        y = int(self.last_position.y())
+        # ad-hoc move. Should be like this:
+        # self.move(x, y)
+        # self.show()
+        self.move(x + 1, y)
+        self.show()
+        self.move(x, y)
+
+    def quit_application(self):
+        # Reset tablet area before quitting
+        subprocess.run(["xsetwacom", "--set", str(self.id_device), "ResetArea"])
+        QApplication.quit()
 
     def update_area(self):
         frame = self.frameGeometry()
