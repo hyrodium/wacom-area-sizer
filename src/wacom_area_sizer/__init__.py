@@ -203,8 +203,8 @@ class MainWindow(QWidget):
             _window_y,
         )
 
-        # Draw tablet area with smoother dashed line
-        painter.setPen(QPen(QColor(100, 100, 100), 2, Qt.DashLine))
+        # Draw tablet area with solid line
+        painter.setPen(QPen(QColor(100, 100, 100), 2, Qt.SolidLine))
         painter.setBrush(Qt.NoBrush)
         painter.drawRect(
             _tablet_origin_x,
