@@ -216,8 +216,18 @@ class MainWindow(QWidget):
         # Draw labels with better font
         painter.setFont(QFont("Sans Serif", 12, QFont.Medium))
         painter.setPen(QColor(60, 60, 60))
-        text_rect = QRect(_display_origin_x, _display_origin_y, 200, 20)
+
+        # Position "Entire display" label to avoid overlap with window/tablet
+        # If window is near top-left, show label at bottom-left instead
+        label_height = 25
+        if _window_origin_y - _display_origin_y < 40:  # Window is near the top
+            # Show at bottom-left
+            text_rect = QRect(_display_origin_x, _display_origin_y + _display_x - label_height, 200, label_height)
+        else:
+            # Show at top-left (default)
+            text_rect = QRect(_display_origin_x, _display_origin_y, 200, label_height)
         painter.drawText(text_rect, Qt.AlignLeft, "Entire display")
+
         text_rect = QRect(_window_origin_x, _window_origin_y, 200, 20)
         painter.drawText(text_rect, Qt.AlignLeft, "Window")
         text_rect = QRect(_tablet_origin_x, _tablet_origin_y - 20, 200, 20)
