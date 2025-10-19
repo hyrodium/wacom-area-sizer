@@ -112,7 +112,7 @@ class MainWindow(QWidget):
     def paintEvent(self, event):
         draw_area = self.rect()
         width = draw_area.width() - 20
-        height = draw_area.height() - 60
+        height = draw_area.height() - 70
 
         # Window vs Display
         if width * self.display_y <= height * self.display_x:
@@ -173,18 +173,24 @@ class MainWindow(QWidget):
             _circle_y = 2 * radius
 
         painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        # Draw display area with subtle shadow effect
         painter.setPen(Qt.NoPen)
-        painter.setBrush(QColor(200, 200, 200))
+        painter.setBrush(QColor(220, 220, 220))
         painter.drawRect(_display_origin_x, _display_origin_y, _display_y, _display_x)
 
-        painter.setBrush(QColor(255, 200, 200))
+        # Draw window area with gradient-like appearance
+        painter.setBrush(QColor(255, 180, 180, 200))
         painter.drawRect(
             _window_origin_x,
             _window_origin_y,
             _window_x,
             _window_y,
         )
-        painter.setPen(QPen(Qt.black, 2, Qt.DashLine))
+
+        # Draw tablet area with smoother dashed line
+        painter.setPen(QPen(QColor(100, 100, 100), 2, Qt.DashLine))
         painter.setBrush(Qt.NoBrush)
         painter.drawRect(
             _tablet_origin_x,
@@ -193,8 +199,9 @@ class MainWindow(QWidget):
             _tablet_y,
         )
 
-        painter.setFont(QFont("Arial", 14))
-        painter.setPen(Qt.black)
+        # Draw labels with better font
+        painter.setFont(QFont("Sans Serif", 12, QFont.Medium))
+        painter.setPen(QColor(60, 60, 60))
         text_rect = QRect(_display_origin_x, _display_origin_y, 200, 20)
         painter.drawText(text_rect, Qt.AlignLeft, "Entire display")
         text_rect = QRect(_window_origin_x, _window_origin_y, 200, 20)
@@ -202,7 +209,8 @@ class MainWindow(QWidget):
         text_rect = QRect(_tablet_origin_x, _tablet_origin_y - 20, 200, 20)
         painter.drawText(text_rect, Qt.AlignLeft, "Tablet")
 
-        painter.setPen(QPen(Qt.black, 2, Qt.SolidLine))
+        # Draw rotation indicator with shadow
+        painter.setPen(QPen(QColor(80, 80, 80), 2, Qt.SolidLine))
         painter.setBrush(QColor(255, 255, 255))
         painter.drawEllipse(
             _circle_origin_x,
@@ -222,17 +230,46 @@ class MainWindow(QWidget):
         self.update_area()
 
     def setup_ui(self):
-        # Add buttons
-        self.button_rotate = QPushButton("Rotate")
-        self.button_opacity = QPushButton("Fade / Reveal")
-        self.button_hide = QPushButton("Hide")
+        # Add buttons with modern styling
+        button_style = """
+            QPushButton {
+                background-color: #f0f0f0;
+                border: 1px solid #c0c0c0;
+                border-radius: 4px;
+                padding: 4px 12px;
+                font-size: 12px;
+                font-weight: 500;
+                color: #333;
+                min-height: 24px;
+                max-height: 28px;
+            }
+            QPushButton:hover {
+                background-color: #e0e0e0;
+                border: 1px solid #a0a0a0;
+            }
+            QPushButton:pressed {
+                background-color: #d0d0d0;
+            }
+        """
 
-        # Layout
+        self.button_rotate = QPushButton("🔄 Rotate")
+        self.button_opacity = QPushButton("👁 Fade / Reveal")
+        self.button_hide = QPushButton("✕ Hide")
+
+        self.button_rotate.setStyleSheet(button_style)
+        self.button_opacity.setStyleSheet(button_style)
+        self.button_hide.setStyleSheet(button_style)
+
+        # Layout with better spacing
         hbox = QHBoxLayout()
+        hbox.setSpacing(8)
+        hbox.setContentsMargins(10, 8, 10, 10)
         hbox.addWidget(self.button_rotate)
         hbox.addWidget(self.button_opacity)
         hbox.addWidget(self.button_hide)
         vbox = QVBoxLayout()
+        vbox.setContentsMargins(0, 0, 0, 0)
+        vbox.setSpacing(0)
         vbox.addStretch(1)
         vbox.addLayout(hbox)
         self.setLayout(vbox)
