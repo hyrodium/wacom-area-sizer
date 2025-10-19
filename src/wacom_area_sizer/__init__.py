@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QPainter, QColor, QPalette, QIcon, QPen, QFont, QAction
 from PySide6.QtCore import Qt, QRect
+from PySide6.QtCore import QTimer
 import subprocess
 import re
 from pathlib import Path
@@ -454,7 +455,6 @@ def main():
 
     # Create a timer to allow Python to process signals
     # Qt event loop blocks signal handling, so we need to wake it up periodically
-    from PySide6.QtCore import QTimer
     timer = QTimer()
     timer.timeout.connect(lambda: None)  # Empty function to wake up the event loop
     timer.start(500)  # Wake up every 500ms
