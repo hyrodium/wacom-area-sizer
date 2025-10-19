@@ -8,12 +8,12 @@ I want to illustrate figures in a specific area, not in the entire display.
 
 # Install
 
-Installation with [rye](https://github.com/astral-sh/rye):
+Installation with [uv](https://docs.astral.sh/uv/):
 
 ```
 git clone https://github.com/hyrodium/wacom-area-sizer
 cd wacom-area-sizer
-rye install .
+uv tool install .
 ```
 
 Prerequisite:
@@ -49,5 +49,5 @@ After hiding, you can reopen the window by clicking the icon in the taskbar.
 # Uninstall
 
 ```
-rye uninstall wacom-area-sizer
+uv tool uninstall wacom-area-sizer
 ```
