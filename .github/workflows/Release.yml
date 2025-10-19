@@ -1,0 +1,62 @@
+name: Release
+on:
+  push:
+    paths:
+      - "pyproject.toml"
+    branches:
+      - main
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+      - name: Install dependencies
+        run: pip install tomlkit packaging
+      - name: Extract version from pyproject.toml
+        run: |
+          VERSION=$(python -c "import tomlkit; print(tomlkit.load(open('pyproject.toml'))['project']['version'])")
+          echo "VERSION=v${VERSION}" >> $GITHUB_ENV
+          if [[ "$VERSION" == *"-dev" ]]; then
+            echo "dev_version=true" >> $GITHUB_ENV
+          else
+            echo "dev_version=false" >> $GITHUB_ENV
+          fi
+      - name: Create Release with Auto-generated Notes
+        if: ${{ env.dev_version == 'false' }}
+        run: |
+          gh release create ${{ env.VERSION }} --title "${{ env.VERSION }}" --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Bump Version in pyproject.toml
+        if: ${{ env.dev_version == 'false' }}
+        run: |
+          NEW_VERSION=$(python -c "import tomlkit; from packaging.version import Version; current_version = Version('${{ env.VERSION }}'[1:]); new_version = f'{current_version.major}.{current_version.minor}.{current_version.micro + 1}-dev'; print(new_version)")
+          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
+          python -c "import tomlkit; doc = tomlkit.load(open('pyproject.toml')); doc['project']['version'] = '${NEW_VERSION}'; tomlkit.dump(doc, open('pyproject.toml', 'w'))"
+      - name: Create new branch, commit changes, and push
+        if: ${{ env.dev_version == 'false' }}
+        run: |
+          git checkout -b "bump-version-to-${{ env.NEW_VERSION }}"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          uv sync
+          git add pyproject.toml
+          git add uv.lock
+          git commit -m "Bump version to ${{ env.NEW_VERSION }}"
+          git push origin "bump-version-to-${{ env.NEW_VERSION }}"
+      - name: Set GH_TOKEN environment variable
+        if: ${{ env.dev_version == 'false' }}
+        run: echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+      - name: Create Pull Request with GitHub CLI
+        if: ${{ env.dev_version == 'false' }}
+        run: |
+          gh pr create --title "Bump version to ${{ env.NEW_VERSION }}" --body "This PR bumps the version in pyproject.toml to ${{ env.NEW_VERSION }}." --head "bump-version-to-${{ env.NEW_VERSION }}" --base main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
