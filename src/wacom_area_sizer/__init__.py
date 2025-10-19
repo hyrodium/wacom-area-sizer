@@ -1,4 +1,5 @@
 import sys
+import signal
 from PySide6.QtWidgets import (
     QApplication,
     QWidget,
@@ -443,5 +444,20 @@ class MainWindow(QWidget):
 def main():
     app = QApplication(sys.argv)
     window = MainWindow()
+
+    # Set up signal handler for Ctrl+C
+    def signal_handler(sig, frame):
+        print("\nReceived Ctrl+C, cleaning up...")
+        window.quit_application()
+
+    signal.signal(signal.SIGINT, signal_handler)
+
+    # Create a timer to allow Python to process signals
+    # Qt event loop blocks signal handling, so we need to wake it up periodically
+    from PySide6.QtCore import QTimer
+    timer = QTimer()
+    timer.timeout.connect(lambda: None)  # Empty function to wake up the event loop
+    timer.start(500)  # Wake up every 500ms
+
     window.show()
     sys.exit(app.exec())
