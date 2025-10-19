@@ -236,10 +236,12 @@ class MainWindow(QWidget):
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self.update_area()
+        self.update()
 
     def moveEvent(self, event):
         super().moveEvent(event)
         self.update_area()
+        self.update()
 
     def setup_ui(self):
         # Add buttons with modern styling
@@ -339,9 +341,9 @@ class MainWindow(QWidget):
     def show_window(self):
         x = int(self.last_position.x())
         y = int(self.last_position.y())
-        # ad-hoc move. Should be like this:
-        # self.move(x, y)
-        # self.show()
+        # Workaround: move to slightly offset position first, then show and move to correct position
+        # This is needed because directly calling self.move(x, y) then self.show() doesn't
+        # properly restore the window to its original position in some window managers
         self.move(x + 1, y)
         self.show()
         self.move(x, y)
